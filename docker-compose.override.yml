@@ -1,0 +1,39 @@
+version: '3.8'
+
+# Override file for development environment
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./database/init-dev.sql:/docker-entrypoint-initdb.d/init-dev.sql
+      
+  redis:
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    
+  backend:
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - DEBUG=*
+    command: npm run dev
+    
+  frontend:
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:3001/api
+    command: npm run dev
+    
+  ai-services:
+    volumes:
+      - ./ai-services:/app
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+    command: python app.py
