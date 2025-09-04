@@ -1,0 +1,274 @@
+name: Performance Testing
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Daily at 2 AM UTC
+  push:
+    branches: [main, develop]
+    paths:
+      - 'frontend/**'
+      - 'backend/**'
+      - 'ai-services/**'
+  workflow_dispatch:
+    inputs:
+      target_environment:
+        description: 'Target environment for testing'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  lighthouse-audit:
+    name: Lighthouse Performance Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.12.x
+        
+      - name: Run Lighthouse CI
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          TARGET_URL: ${{ github.event.inputs.target_environment == 'production' && 'https://investorshiksha.com' || 'https://staging.investorshiksha.com' }}
+        run: |
+          lhci autorun --upload.target=temporary-public-storage --collect.url=$TARGET_URL
+          
+      - name: Upload Lighthouse results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+          retention-days: 7
+
+  load-testing:
+    name: Load Testing with Artillery
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Install Artillery
+        run: npm install -g artillery@latest
+        
+      - name: Create Artillery config
+        run: |
+          cat > artillery.yml << EOF
+          config:
+            target: '${{ github.event.inputs.target_environment == 'production' && 'https://investorshiksha.com' || 'https://staging.investorshiksha.com' }}'
+            phases:
+              - duration: 60
+                arrivalRate: 10
+                name: "Warm up"
+              - duration: 300
+                arrivalRate: 50
+                name: "Sustained load"
+              - duration: 120
+                arrivalRate: 100
+                name: "Peak load"
+          scenarios:
+            - name: "Homepage and API endpoints"
+              flow:
+                - get:
+                    url: "/"
+                - get:
+                    url: "/api/health"
+                - get:
+                    url: "/api/courses"
+                - post:
+                    url: "/api/auth/login"
+                    json:
+                      email: "test@example.com"
+                      password: "testpassword"
+          EOF
+          
+      - name: Run load test
+        run: |
+          artillery run artillery.yml --output artillery-report.json
+          artillery report artillery-report.json --output artillery-report.html
+          
+      - name: Upload Artillery results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: artillery-results
+          path: |
+            artillery-report.json
+            artillery-report.html
+          retention-days: 7
+
+  database-performance:
+    name: Database Performance Testing
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+        
+      - name: Run database performance tests
+        working-directory: backend
+        run: |
+          npm run test:performance
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_TEST }}
+          
+      - name: Upload DB performance results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: db-performance-results
+          path: backend/performance-results/
+          retention-days: 7
+
+  api-performance:
+    name: API Performance Testing
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Install k6
+        run: |
+          curl https://github.com/grafana/k6/releases/download/v0.46.0/k6-v0.46.0-linux-amd64.tar.gz -L | tar xvz --strip-components 1
+          sudo cp k6 /usr/local/bin
+          
+      - name: Create k6 test script
+        run: |
+          cat > api-performance-test.js << 'EOF'
+          import http from 'k6/http';
+          import { check, sleep } from 'k6';
+          import { Rate } from 'k6/metrics';
+          
+          export let errorRate = new Rate('errors');
+          
+          export let options = {
+            stages: [
+              { duration: '30s', target: 20 }, // Ramp up
+              { duration: '1m', target: 50 },  // Stay at 50 users
+              { duration: '30s', target: 100 }, // Ramp up to 100 users
+              { duration: '2m', target: 100 }, // Stay at 100 users
+              { duration: '30s', target: 0 },  // Ramp down
+            ],
+            thresholds: {
+              http_req_duration: ['p(95)<500'], // 95% of requests under 500ms
+              http_req_failed: ['rate<0.02'],   // Error rate under 2%
+            },
+          };
+          
+          const BASE_URL = __ENV.TARGET_URL || 'https://staging.investorshiksha.com';
+          
+          export default function() {
+            let response = http.get(`${BASE_URL}/api/health`);
+            check(response, {
+              'status is 200': (r) => r.status === 200,
+              'response time OK': (r) => r.timings.duration < 500,
+            }) || errorRate.add(1);
+            
+            response = http.get(`${BASE_URL}/api/courses`);
+            check(response, {
+              'courses API works': (r) => r.status === 200,
+            }) || errorRate.add(1);
+            
+            response = http.get(`${BASE_URL}/api/market/health`);
+            check(response, {
+              'market API works': (r) => r.status === 200,
+            }) || errorRate.add(1);
+            
+            sleep(1);
+          }
+          EOF
+          
+      - name: Run k6 performance test
+        env:
+          TARGET_URL: ${{ github.event.inputs.target_environment == 'production' && 'https://investorshiksha.com' || 'https://staging.investorshiksha.com' }}
+        run: |
+          k6 run --out json=k6-results.json api-performance-test.js
+          
+      - name: Upload k6 results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: k6-results
+          path: k6-results.json
+          retention-days: 7
+
+  performance-report:
+    name: Generate Performance Report
+    runs-on: ubuntu-latest
+    needs: [lighthouse-audit, load-testing, database-performance, api-performance]
+    if: always()
+    
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        
+      - name: Generate performance summary
+        run: |
+          echo "# Performance Test Results" > performance-summary.md
+          echo "## Test Run: $(date)" >> performance-summary.md
+          echo "## Environment: ${{ github.event.inputs.target_environment || 'staging' }}" >> performance-summary.md
+          echo "" >> performance-summary.md
+          echo "### Lighthouse Audit" >> performance-summary.md
+          echo "- Performance score and metrics available in lighthouse-results/" >> performance-summary.md
+          echo "" >> performance-summary.md
+          echo "### Load Testing" >> performance-summary.md
+          echo "- Artillery load test results available in artillery-results/" >> performance-summary.md
+          echo "" >> performance-summary.md
+          echo "### API Performance" >> performance-summary.md
+          echo "- K6 API performance results available in k6-results/" >> performance-summary.md
+          echo "" >> performance-summary.md
+          echo "### Database Performance" >> performance-summary.md
+          echo "- Database performance metrics available in db-performance-results/" >> performance-summary.md
+          
+      - name: Upload performance summary
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-summary
+          path: performance-summary.md
+          retention-days: 30
+          
+      - name: Comment PR with performance results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('performance-summary.md', 'utf8');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
