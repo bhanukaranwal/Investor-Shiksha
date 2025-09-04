@@ -1,0 +1,72 @@
+{
+  "common": {
+    "loading": "लोड होत आहे...",
+    "error": "त्रुटी आली",
+    "success": "यश",
+    "warning": "चेतावणी",
+    "info": "माहिती",
+    "save": "जतन करा",
+    "cancel": "रद्द करा",
+    "delete": "हटवा",
+    "edit": "संपादित करा",
+    "view": "पहा",
+    "search": "शोधा",
+    "filter": "फिल्टर",
+    "sort": "क्रमवारी लावा",
+    "next": "पुढे",
+    "previous": "मागे",
+    "submit": "सबमिट करा",
+    "reset": "रीसेट करा",
+    "confirm": "पुष्टी करा",
+    "close": "बंद करा"
+  },
+  "navigation": {
+    "home": "मुख्यपृष्ठ",
+    "dashboard": "डॅशबोर्ड",
+    "courses": "कोर्सेस",
+    "trading": "व्यापार",
+    "portfolio": "पोर्टफोलिओ",
+    "analytics": "विश्लेषण",
+    "community": "समुदाय",
+    "news": "बातम्या",
+    "tools": "साधने",
+    "profile": "प्रोफाइल",
+    "settings": "सेटिंग्स",
+    "help": "मदत",
+    "logout": "बाहेर पडा"
+  },
+  "auth": {
+    "login": "लॉगिन",
+    "register": "नोंदणी करा",
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "confirmPassword": "पासवर्डची पुष्टी करा",
+    "firstName": "नाव",
+    "lastName": "आडनाव",
+    "forgotPassword": "पासवर्ड विसरलात?",
+    "rememberMe": "मला लक्षात ठेवा",
+    "loginSuccess": "लॉगिन यशस्वी!",
+    "loginError": "लॉगिन अपयशी. कृपया तुमची माहिती तपासा."
+  },
+  "dashboard": {
+    "welcome": "पुन्हा स्वागत आहे, {{name}}!",
+    "portfolioPerformance": "पोर्टफोलिओ कामगिरी",
+    "learningProgress": "शिकण्याची प्रगती",
+    "recentActivity": "अलीकडील क्रियाकलाप"
+  },
+  "trading": {
+    "buy": "विकत घ्या",
+    "sell": "विका",
+    "symbol": "चिन्ह",
+    "quantity": "प्रमाण",
+    "price": "किंमत",
+    "total": "एकूण"
+  },
+  "courses": {
+    "allCourses": "सर्व कोर्सेस",
+    "myCourses": "माझे कोर्सेस",
+    "enroll": "प्रवेश घ्या",
+    "continue": "सुरू ठेवा",
+    "startCourse": "कोर्स सुरू करा"
+  }
+}
