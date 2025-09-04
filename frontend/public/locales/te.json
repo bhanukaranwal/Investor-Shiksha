@@ -1,0 +1,72 @@
+{
+  "common": {
+    "loading": "లోడ్ అవుతోంది...",
+    "error": "లోపం జరిగింది",
+    "success": "విజయం",
+    "warning": "హెచ్చరిక",
+    "info": "సమాచారం",
+    "save": "సేవ్ చేయి",
+    "cancel": "రద్దు చేయి",
+    "delete": "తొలగించు",
+    "edit": "సవరించు",
+    "view": "చూడు",
+    "search": "వెతుకు",
+    "filter": "ఫిల్టర్",
+    "sort": "క్రమం చేయి",
+    "next": "తదుపరి",
+    "previous": "మునుపటి",
+    "submit": "సమర్పించు",
+    "reset": "రీసెట్",
+    "confirm": "ధృవీకరించు",
+    "close": "మూసివేయి"
+  },
+  "navigation": {
+    "home": "హోమ్",
+    "dashboard": "డాష్‌బోర్డ్",
+    "courses": "కోర్సులు",
+    "trading": "వాణిజ్యం",
+    "portfolio": "పోర్ట్‌ఫోలియో",
+    "analytics": "విశ్లేషణలు",
+    "community": "సమాజం",
+    "news": "వార్తలు",
+    "tools": "సాధనలు",
+    "profile": "ప్రొఫైల్",
+    "settings": "సెట్టింగ్స్",
+    "help": "సహాయం",
+    "logout": "లాగౌట్"
+  },
+  "auth": {
+    "login": "లాగిన్",
+    "register": "రిజిస్టర్",
+    "email": "ఇమెయిల్",
+    "password": "పాస్‌వర్డ్",
+    "confirmPassword": "పాస్‌వర్డ్ ధృవీకరణ",
+    "firstName": "మొదటి పేరు",
+    "lastName": "చివరి పేరు",
+    "forgotPassword": "పాస్‌వర్డ్ మర్చిపోయారా?",
+    "rememberMe": "నన్ను గుర్తుంచుకో",
+    "loginSuccess": "లాగిన్ విజయవంతం!",
+    "loginError": "లాగిన్ విఫలమైంది. దయచేసి మీ వివరాలను తనిఖీ చేయండి."
+  },
+  "dashboard": {
+    "welcome": "తిరిగి స్వాగతం, {{name}}!",
+    "portfolioPerformance": "పోర్ట్‌ఫోలియో పనితీరు",
+    "learningProgress": "అభ్యాస పురోగతి",
+    "recentActivity": "ఇటీవలి కార్యకలాపం"
+  },
+  "trading": {
+    "buy": "కొనుగోలు",
+    "sell": "అమ్మకం",
+    "symbol": "చిహ్నం",
+    "quantity": "పరిమాణం",
+    "price": "ధర",
+    "total": "మొత్తం"
+  },
+  "courses": {
+    "allCourses": "అన్ని కోర్సులు",
+    "myCourses": "నా కోర్సులు",
+    "enroll": "చేరండి",
+    "continue": "కొనసాగించు",
+    "startCourse": "కోర్సు ప్రారంభించు"
+  }
+}
