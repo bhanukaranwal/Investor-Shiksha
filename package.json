@@ -2,42 +2,33 @@
   "name": "investor-shiksha-platform",
   "version": "1.0.0",
   "description": "SEBI Hackathon - Multilingual Investor Education Platform",
-  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend", 
+    "ai-services",
+    "mobile"
+  ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:ai\"",
-    "dev:backend": "cd backend && npm run dev",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" \"npm run dev:ai\"",
     "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev", 
     "dev:ai": "cd ai-services && python app.py",
     "build": "npm run build:frontend && npm run build:backend",
     "build:frontend": "cd frontend && npm run build",
     "build:backend": "cd backend && npm run build",
-    "test": "npm run test:backend && npm run test:frontend",
-    "test:backend": "cd backend && npm test",
+    "test": "npm run test:frontend && npm run test:backend",
     "test:frontend": "cd frontend && npm test",
-    "docker:build": "docker-compose build",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "deploy": "./scripts/deploy.sh",
-    "migrate": "./scripts/migrate.sh",
-    "seed": "./scripts/seed.sh",
-    "backup": "./scripts/backup.sh",
-    "security-scan": "./scripts/security-scan.sh"
+    "test:backend": "cd backend && npm test",
+    "deploy:staging": "./scripts/deploy.sh staging",
+    "deploy:production": "./scripts/deploy.sh production",
+    "health-check": "./scripts/health-check.sh"
   },
-  "keywords": ["investor", "education", "trading", "sebi", "multilingual"],
-  "author": "Investor Shiksha Team",
-  "license": "MIT",
   "devDependencies": {
-    "concurrently": "^8.2.0",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.2.3"
+    "concurrently": "^8.2.0"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": ["eslint --fix", "prettier --write"],
-    "*.{json,css,md}": ["prettier --write"]
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   }
 }
