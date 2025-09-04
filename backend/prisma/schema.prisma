@@ -1,0 +1,664 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String            @id @default(uuid())
+  email             String            @unique
+  username          String            @unique
+  firstName         String
+  lastName          String
+  avatar            String?
+  phoneNumber       String?
+  dateOfBirth       DateTime?
+  gender            String?
+  country           String?
+  state             String?
+  city              String?
+  pincode           String?
+  occupation        String?
+  annualIncome      Decimal?
+  investmentExperience String?
+  riskProfile       RiskLevel         @default(MODERATE)
+  preferredLanguage LanguageCode      @default(EN)
+  password          String
+  role              UserRole          @default(USER)
+  status            UserStatus        @default(PENDING_VERIFICATION)
+  isEmailVerified   Boolean           @default(false)
+  isPhoneVerified   Boolean           @default(false)
+  twoFactorEnabled  Boolean           @default(false)
+  twoFactorSecret   String?
+  lastLoginAt       DateTime?
+  loginCount        Int               @default(0)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  
+  // Social login
+  googleId          String?
+  facebookId        String?
+  
+  // Preferences
+  theme             String            @default("light")
+  notifications     Json              @default("{}")
+  privacy           Json              @default("{}")
+  
+  // Relations
+  enrollments       Enrollment[]
+  assessmentResults AssessmentResult[]
+  portfolios        Portfolio[]
+  trades            Trade[]
+  transactions      Transaction[]
+  posts             ForumPost[]
+  replies           ForumReply[]
+  notifications     Notification[]
+  achievements      UserAchievement[]
+  learningProgress  LearningProgress[]
+  watchlists        Watchlist[]
+  reviews           CourseReview[]
+  socialProfiles    SocialProfile[]
+  sessions          UserSession[]
+  refreshTokens     RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("refresh_tokens")
+}
+
+model UserSession {
+  id          String   @id @default(uuid())
+  userId      String
+  sessionId   String   @unique
+  ipAddress   String
+  userAgent   String
+  isActive    Boolean  @default(true)
+  lastActive  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_sessions")
+}
+
+model Course {
+  id              String        @id @default(uuid())
+  title           String
+  slug            String        @unique
+  description     String
+  shortDescription String?
+  thumbnail       String?
+  banner          String?
+  level           CourseLevel
+  status          CourseStatus  @default(DRAFT)
+  price           Decimal       @default(0)
+  originalPrice   Decimal?
+  duration        Int           // in minutes
+  language        LanguageCode  @default(EN)
+  tags            String[]
+  prerequisites   String[]
+  learningOutcomes String[]
+  category        String
+  subcategory     String?
+  instructorId    String
+  totalLessons    Int           @default(0)
+  totalEnrollments Int          @default(0)
+  averageRating   Decimal       @default(0)
+  totalReviews    Int           @default(0)
+  isPublished     Boolean       @default(false)
+  isFeatured      Boolean       @default(false)
+  publishedAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  // Relations
+  instructor      User          @relation("CourseInstructor", fields: [instructorId], references: [id])
+  lessons         Lesson[]
+  enrollments     Enrollment[]
+  assessments     Assessment[]
+  reviews         CourseReview[]
+  translations    CourseTranslation[]
+  
+  @@map("courses")
+}
+
+model CourseTranslation {
+  id               String       @id @default(uuid())
+  courseId         String
+  language         LanguageCode
+  title            String
+  description      String
+  shortDescription String?
+  learningOutcomes String[]
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@unique([courseId, language])
+  @@map("course_translations")
+}
+
+model Lesson {
+  id          String    @id @default(uuid())
+  courseId    String
+  title       String
+  slug        String
+  description String?
+  content     String?
+  videoUrl    String?
+  duration    Int       // in seconds
+  order       Int
+  isPreview   Boolean   @default(false)
+  isPublished Boolean   @default(false)
+  resources   Json      @default("[]")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  course            Course             @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  learningProgress  LearningProgress[]
+  
+  @@unique([courseId, slug])
+  @@map("lessons")
+}
+
+model Enrollment {
+  id              String    @id @default(uuid())
+  userId          String
+  courseId        String
+  enrolledAt      DateTime  @default(now())
+  completedAt     DateTime?
+  progress        Decimal   @default(0)
+  lastAccessedAt  DateTime?
+  certificateUrl  String?
+  
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, courseId])
+  @@map("enrollments")
+}
+
+model LearningProgress {
+  id            String   @id @default(uuid())
+  userId        String
+  lessonId      String
+  isCompleted   Boolean  @default(false)
+  timeSpent     Int      @default(0) // in seconds
+  completedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, lessonId])
+  @@map("learning_progress")
+}
+
+model Assessment {
+  id            String         @id @default(uuid())
+  courseId      String?
+  title         String
+  description   String?
+  type          AssessmentType
+  duration      Int?           // in minutes
+  totalMarks    Int
+  passingMarks  Int
+  maxAttempts   Int            @default(3)
+  isRandomized  Boolean        @default(false)
+  showResults   Boolean        @default(true)
+  isPublished   Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  course    Course?            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  questions Question[]
+  results   AssessmentResult[]
+  
+  @@map("assessments")
+}
+
+model Question {
+  id           String       @id @default(uuid())
+  assessmentId String
+  type         QuestionType
+  question     String
+  options      Json?        // for multiple choice questions
+  correctAnswer String
+  explanation  String?
+  marks        Int          @default(1)
+  order        Int
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  
+  @@map("questions")
+}
+
+model AssessmentResult {
+  id           String   @id @default(uuid())
+  userId       String
+  assessmentId String
+  answers      Json
+  score        Int
+  totalMarks   Int
+  percentage   Decimal
+  isPassed     Boolean
+  timeSpent    Int      // in seconds
+  attemptNumber Int
+  submittedAt  DateTime @default(now())
+  
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  
+  @@map("assessment_results")
+}
+
+model Portfolio {
+  id            String        @id @default(uuid())
+  userId        String
+  name          String
+  type          PortfolioType @default(SIMULATION)
+  totalValue    Decimal       @default(0)
+  cashBalance   Decimal       @default(100000) // Default simulation balance
+  totalPnL      Decimal       @default(0)
+  dayPnL        Decimal       @default(0)
+  totalReturn   Decimal       @default(0)
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  holdings     Holding[]
+  trades       Trade[]
+  transactions Transaction[]
+  
+  @@map("portfolios")
+}
+
+model Holding {
+  id              String    @id @default(uuid())
+  portfolioId     String
+  symbol          String
+  quantity        Int
+  averagePrice    Decimal
+  currentPrice    Decimal   @default(0)
+  totalValue      Decimal   @default(0)
+  unrealizedPnL   Decimal   @default(0)
+  realizedPnL     Decimal   @default(0)
+  lastUpdated     DateTime  @default(now())
+  
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  
+  @@unique([portfolioId, symbol])
+  @@map("holdings")
+}
+
+model Trade {
+  id          String      @id @default(uuid())
+  userId      String
+  portfolioId String
+  symbol      String
+  type        TradeType
+  orderType   OrderType
+  quantity    Int
+  price       Decimal
+  executedPrice Decimal?
+  status      OrderStatus @default(PENDING)
+  executedAt  DateTime?
+  expiresAt   DateTime?
+  fees        Decimal     @default(0)
+  notes       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  
+  @@map("trades")
+}
+
+model Transaction {
+  id          String          @id @default(uuid())
+  userId      String
+  portfolioId String?
+  type        TransactionType
+  amount      Decimal
+  description String?
+  reference   String?
+  status      String          @default("completed")
+  createdAt   DateTime        @default(now())
+  
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  portfolio Portfolio? @relation(fields: [portfolioId], references: [id], onDelete: SetNull)
+  
+  @@map("transactions")
+}
+
+model MarketData {
+  id            String   @id @default(uuid())
+  symbol        String   @unique
+  name          String
+  sector        String?
+  industry      String?
+  marketCap     Decimal?
+  currentPrice  Decimal
+  previousClose Decimal
+  change        Decimal
+  changePercent Decimal
+  volume        BigInt
+  avgVolume     BigInt?
+  high52Week    Decimal?
+  low52Week     Decimal?
+  pe            Decimal?
+  eps           Decimal?
+  dividend      Decimal?
+  dividendYield Decimal?
+  beta          Decimal?
+  lastUpdated   DateTime @default(now())
+  
+  @@map("market_data")
+}
+
+model Watchlist {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  symbols   String[]
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("watchlists")
+}
+
+model ForumPost {
+  id          String     @id @default(uuid())
+  authorId    String
+  title       String
+  content     String
+  category    String
+  tags        String[]
+  status      PostStatus @default(PUBLISHED)
+  views       Int        @default(0)
+  likes       Int        @default(0)
+  isPinned    Boolean    @default(false)
+  isClosed    Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  
+  author  User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  replies ForumReply[]
+  
+  @@map("forum_posts")
+}
+
+model ForumReply {
+  id        String   @id @default(uuid())
+  postId    String
+  authorId  String
+  content   String
+  parentId  String?  // for nested replies
+  likes     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  post   ForumPost    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent ForumReply?  @relation("ReplyToReply", fields: [parentId], references: [id])
+  replies ForumReply[] @relation("ReplyToReply")
+  
+  @@map("forum_replies")
+}
+
+model Notification {
+  id        String             @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?
+  status    NotificationStatus @default(UNREAD)
+  createdAt DateTime           @default(now())
+  readAt    DateTime?
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("notifications")
+}
+
+model Achievement {
+  id          String @id @default(uuid())
+  name        String @unique
+  description String
+  icon        String
+  category    String
+  points      Int
+  condition   Json   // Criteria for earning the achievement
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  
+  userAchievements UserAchievement[]
+  
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(uuid())
+  userId        String
+  achievementId String
+  earnedAt      DateTime @default(now())
+  
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model CourseReview {
+  id        String   @id @default(uuid())
+  userId    String
+  courseId  String
+  rating    Int      // 1-5 stars
+  review    String?
+  isPublic  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, courseId])
+  @@map("course_reviews")
+}
+
+model SocialProfile {
+  id        String   @id @default(uuid())
+  userId    String
+  platform  String   // twitter, linkedin, etc.
+  profileUrl String
+  username  String?
+  isPublic  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, platform])
+  @@map("social_profiles")
+}
+
+model News {
+  id          String   @id @default(uuid())
+  title       String
+  summary     String
+  content     String
+  imageUrl    String?
+  source      String
+  sourceUrl   String
+  category    String
+  tags        String[]
+  sentiment   String?  // positive, negative, neutral
+  language    LanguageCode @default(EN)
+  publishedAt DateTime
+  createdAt   DateTime @default(now())
+  
+  @@map("news")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  resource  String
+  resourceId String?
+  oldData   Json?
+  newData   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  
+  @@map("audit_logs")
+}
+
+model SystemConfig {
+  id    String @id @default(uuid())
+  key   String @unique
+  value Json
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("system_config")
+}
+
+// Enums
+enum UserRole {
+  USER
+  ADMIN
+  MODERATOR
+  INSTRUCTOR
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+}
+
+enum CourseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AssessmentType {
+  QUIZ
+  ASSIGNMENT
+  EXAM
+  PRACTICAL
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  FILL_BLANK
+  MATCHING
+  ESSAY
+}
+
+enum TradeType {
+  BUY
+  SELL
+}
+
+enum OrderType {
+  MARKET
+  LIMIT
+  STOP_LOSS
+  STOP_LIMIT
+}
+
+enum OrderStatus {
+  PENDING
+  EXECUTED
+  CANCELLED
+  EXPIRED
+}
+
+enum NotificationType {
+  SYSTEM
+  COURSE
+  TRADING
+  COMMUNITY
+  ACHIEVEMENT
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
+  ARCHIVED
+}
+
+enum RiskLevel {
+  CONSERVATIVE
+  MODERATE
+  AGGRESSIVE
+}
+
+enum PortfolioType {
+  REAL
+  SIMULATION
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  TRADE
+  DIVIDEND
+  FEE
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  FLAGGED
+}
+
+enum LanguageCode {
+  EN
+  HI
+  TA
+  TE
+  BN
+  MR
+  GU
+  KN
+  ML
+}
