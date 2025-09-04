@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Investor Shiksha</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 40px 20px; text-align: center; }
+        .logo { font-size: 28px; font-weight: bold; margin-bottom: 10px; }
+        .tagline { font-size: 16px; opacity: 0.9; }
+        .content { padding: 40px 20px; }
+        .welcome-text { font-size: 24px; font-weight: 600; color: #1f2937; margin-bottom: 20px; }
+        .description { font-size: 16px; line-height: 1.6; color: #4b5563; margin-bottom: 30px; }
+        .cta-button { display: inline-block; background-color: #3b82f6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
+        .features { margin: 30px 0; }
+        .feature { display: flex; align-items: center; margin: 15px 0; }
+        .feature-icon { width: 24px; height: 24px; background-color: #22c55e; border-radius: 50%; margin-right: 15px; }
+        .footer { background-color: #f3f4f6; padding: 30px 20px; text-align: center; color: #6b7280; font-size: 14px; }
+        .social-links { margin: 20px 0; }
+        .social-link { display: inline-block; margin: 0 10px; color: #3b82f6; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Investor Shiksha</div>
+            <div class="tagline">Learn • Trade • Succeed</div>
+        </div>
+        
+        <div class="content">
+            <h2 class="welcome-text">Welcome to Your Investment Journey! 🚀</h2>
+            
+            <p class="description">
+                Dear {{firstName}},<br><br>
+                Congratulations on joining Investor Shiksha! You've taken the first step towards mastering the art of investing and trading. Our platform is designed to empower you with knowledge, skills, and practical experience in the financial markets.
+            </p>
+            
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon"></div>
+                    <span>📚 Comprehensive courses in your preferred language</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon"></div>
+                    <span>💼 Risk-free trading simulation</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon"></div>
+                    <span>🤖 AI-powered personalized recommendations</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon"></div>
+                    <span>🎯 Portfolio management tools</span>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon"></div>
+                    <span>👥 Community of learners and experts</span>
+                </div>
+            </div>
+            
+            <p class="description">
+                Ready to start your learning journey? Click the button below to complete your profile setup and unlock all features.
+            </p>
+            
+            <center>
+                <a href="{{dashboardUrl}}" class="cta-button">Complete Your Profile</a>
+            </center>
+            
+            <p class="description">
+                If you have any questions or need assistance, our support team is here to help. Reply to this email or visit our help center.
+            </p>
+            
+            <p class="description">
+                Happy Learning!<br>
+                The Investor Shiksha Team
+            </p>
+        </div>
+        
+        <div class="footer">
+            <div class="social-links">
+                <a href="#" class="social-link">Twitter</a>
+                <a href="#" class="social-link">LinkedIn</a>
+                <a href="#" class="social-link">Facebook</a>
+                <a href="#" class="social-link">YouTube</a>
+            </div>
+            <p>© 2025 Investor Shiksha. All rights reserved.</p>
+            <p>You received this email because you created an account on our platform.</p>
+            <p><a href="{{unsubscribeUrl}}" style="color: #3b82f6;">Unsubscribe</a> | <a href="{{privacyUrl}}" style="color: #3b82f6;">Privacy Policy</a></p>
+        </div>
+    </div>
+</body>
+</html>
