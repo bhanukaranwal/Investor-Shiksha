@@ -1,0 +1,72 @@
+{
+  "common": {
+    "loading": "લોડ થઈ રહ્યું છે...",
+    "error": "ભૂલ આવી",
+    "success": "સફળતા",
+    "warning": "ચેતવણી",
+    "info": "માહિતી",
+    "save": "સેવ કરો",
+    "cancel": "રદ કરો",
+    "delete": "ડિલીટ કરો",
+    "edit": "એડિટ કરો",
+    "view": "જુઓ",
+    "search": "શોધો",
+    "filter": "ફિલ્ટર",
+    "sort": "ક્રમાંકન કરો",
+    "next": "આગળ",
+    "previous": "પાછળ",
+    "submit": "સબમિટ કરો",
+    "reset": "રીસેટ કરો",
+    "confirm": "પુષ્ટિ કરો",
+    "close": "બંધ કરો"
+  },
+  "navigation": {
+    "home": "હોમ",
+    "dashboard": "ડેશબોર્ડ",
+    "courses": "કોર્સેસ",
+    "trading": "વેપાર",
+    "portfolio": "પોર્ટફોલિયો",
+    "analytics": "વિશ્લેષણ",
+    "community": "સમુદાય",
+    "news": "સમાચાર",
+    "tools": "ટૂલ્સ",
+    "profile": "પ્રોફાઇલ",
+    "settings": "સેટિંગ્સ",
+    "help": "મદદ",
+    "logout": "બહાર નીકળો"
+  },
+  "auth": {
+    "login": "લોગિન",
+    "register": "રજિસ્ટર",
+    "email": "ઇમેઇલ",
+    "password": "પાસવર્ડ",
+    "confirmPassword": "પાસવર્ડ કન્ફર્મ કરો",
+    "firstName": "પ્રથમ નામ",
+    "lastName": "છેલ્લું નામ",
+    "forgotPassword": "પાસવર્ડ ભૂલી ગયા?",
+    "rememberMe": "મને યાદ રાખો",
+    "loginSuccess": "લોગિન સફળ!",
+    "loginError": "લોગિન નિષ્ફળ. કૃપા કરીને તમારી વિગતો તપાસો."
+  },
+  "dashboard": {
+    "welcome": "ફરીથી આપનું સ્વાગત છે, {{name}}!",
+    "portfolioPerformance": "પોર્ટફોલિયો પ્રદર્શન",
+    "learningProgress": "શીખવાની પ્રગતિ",
+    "recentActivity": "તાજેતરની પ્રવૃત્તિ"
+  },
+  "trading": {
+    "buy": "ખરીદો",
+    "sell": "વેચો",
+    "symbol": "સિમ્બોલ",
+    "quantity": "જથ્થો",
+    "price": "કિંમત",
+    "total": "કુલ"
+  },
+  "courses": {
+    "allCourses": "બધા કોર્સેસ",
+    "myCourses": "મારા કોર્સેસ",
+    "enroll": "દાખલ થાઓ",
+    "continue": "ચાલુ રાખો",
+    "startCourse": "કોર્સ શરૂ કરો"
+  }
+}
