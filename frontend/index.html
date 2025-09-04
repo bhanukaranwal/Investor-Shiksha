@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="Multilingual Investor Education Platform - Learn Trading, Portfolio Management & Financial Literacy" />
+    <meta name="keywords" content="investor education, trading, portfolio, financial literacy, multilingual" />
+    <meta name="author" content="Investor Shiksha Team" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://investorshiksha.com/" />
+    <meta property="og:title" content="Investor Shiksha - Multilingual Investor Education" />
+    <meta property="og:description" content="Learn investing and trading in your native language with AI-powered personalized education" />
+    <meta property="og:image" content="https://investorshiksha.com/og-image.jpg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://investorshiksha.com/" />
+    <meta property="twitter:title" content="Investor Shiksha - Multilingual Investor Education" />
+    <meta property="twitter:description" content="Learn investing and trading in your native language with AI-powered personalized education" />
+    <meta property="twitter:image" content="https://investorshiksha.com/twitter-image.jpg" />
+    
+    <title>Investor Shiksha - Multilingual Investor Education Platform</title>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#1f2937" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Investor Shiksha" />
+    
+    <!-- Icons -->
+    <link rel="icon" href="/icons/favicon.ico" />
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- Critical CSS for above-the-fold content -->
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: 'Inter', sans-serif; }
+      .loading-container { 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        right: 0; 
+        bottom: 0; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        background: #ffffff; 
+        z-index: 9999; 
+      }
+      .loading-spinner { 
+        width: 40px; 
+        height: 40px; 
+        border: 3px solid #e5e7eb; 
+        border-top: 3px solid #3b82f6; 
+        border-radius: 50%; 
+        animation: spin 1s linear infinite; 
+      }
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+  </head>
+  <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-container">
+      <div class="loading-spinner"></div>
+    </div>
+    
+    <!-- Main App Container -->
+    <div id="root"></div>
+    
+    <!-- Hide loading screen when app loads -->
+    <script>
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const loadingScreen = document.getElementById('loading-screen');
+          if (loadingScreen) {
+            loadingScreen.style.display = 'none';
+          }
+        }, 1000);
+      });
+    </script>
+    
+    <!-- Main App Script -->
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => console.log('SW registered: ', registration))
+            .catch(registrationError => console.log('SW registration failed: ', registrationError));
+        });
+      }
+    </script>
+  </body>
+</html>
