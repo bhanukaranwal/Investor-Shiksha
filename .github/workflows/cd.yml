@@ -1,0 +1,149 @@
+name: Continuous Deployment
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: 123456789012.dkr.ecr.us-east-1.amazonaws.com
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.event.inputs.environment == 'staging'
+    environment: staging
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        
+      - name: Deploy infrastructure
+        working-directory: terraform
+        run: |
+          terraform init
+          terraform workspace select staging || terraform workspace new staging
+          terraform plan -var="environment=staging" -var="image_tag=${{ github.sha }}" -out=tfplan
+          terraform apply tfplan
+          
+      - name: Update ECS services
+        run: |
+          aws ecs update-service --cluster investor-shiksha-staging --service investor-shiksha-frontend-staging --force-new-deployment
+          aws ecs update-service --cluster investor-shiksha-staging --service investor-shiksha-backend-staging --force-new-deployment
+          aws ecs update-service --cluster investor-shiksha-staging --service investor-shiksha-ai-staging --force-new-deployment
+          
+      - name: Wait for deployment
+        run: |
+          aws ecs wait services-stable --cluster investor-shiksha-staging --services investor-shiksha-frontend-staging investor-shiksha-backend-staging investor-shiksha-ai-staging
+          
+      - name: Run health checks
+        run: |
+          echo "Running health checks for staging environment..."
+          curl -f https://staging.investorshiksha.com/health || exit 1
+          curl -f https://staging.investorshiksha.com/api/health || exit 1
+          
+      - name: Notify deployment success
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          channel: '#deployments'
+          text: '✅ Staging deployment successful!'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.event.inputs.environment == 'production'
+    environment: production
+    needs: [deploy-staging]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        
+      - name: Create deployment backup
+        run: |
+          echo "Creating backup before production deployment..."
+          ./scripts/backup.sh
+          
+      - name: Deploy infrastructure
+        working-directory: terraform
+        run: |
+          terraform init
+          terraform workspace select production || terraform workspace new production
+          terraform plan -var="environment=production" -var="image_tag=${{ github.sha }}" -out=tfplan
+          terraform apply tfplan
+          
+      - name: Update ECS services with blue-green deployment
+        run: |
+          echo "Performing blue-green deployment..."
+          ./scripts/blue-green-deploy.sh production ${{ github.sha }}
+          
+      - name: Run comprehensive health checks
+        run: |
+          echo "Running comprehensive health checks..."
+          ./scripts/health-check.sh production
+          
+      - name: Run smoke tests
+        run: |
+          echo "Running smoke tests..."
+          npm run test:smoke -- --env=production
+          
+      - name: Notify deployment success
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          channel: '#deployments'
+          text: '🚀 Production deployment successful!'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "Deployment failed, initiating rollback..."
+          ./scripts/rollback.sh production
+          
+      - name: Notify rollback
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          channel: '#deployments'
+          text: '⚠️ Production deployment failed and rolled back!'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
