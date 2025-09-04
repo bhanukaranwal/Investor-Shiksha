@@ -1,0 +1,72 @@
+{
+  "common": {
+    "loading": "ஏற்றுகிறது...",
+    "error": "பிழை ஏற்பட்டது",
+    "success": "வெற்றி",
+    "warning": "எச்சரிக்கை",
+    "info": "தகவல்",
+    "save": "சேமி",
+    "cancel": "ரத்து செய்",
+    "delete": "அழி",
+    "edit": "திருத்து",
+    "view": "பார்",
+    "search": "தேடு",
+    "filter": "வடிகட்டு",
+    "sort": "வரிசைப்படுத்து",
+    "next": "அடுத்து",
+    "previous": "முன்",
+    "submit": "சமர்ப்பி",
+    "reset": "மீட்டமை",
+    "confirm": "உறுதிப்படுத்து",
+    "close": "மூடு"
+  },
+  "navigation": {
+    "home": "முகப்பு",
+    "dashboard": "கட்டுப்பாடு பலகை",
+    "courses": "பாடங்கள்",
+    "trading": "வணிகம்",
+    "portfolio": "முதலீட்டு தொகுப்பு",
+    "analytics": "பகுப்பாய்வு",
+    "community": "சமூகம்",
+    "news": "செய்திகள்",
+    "tools": "கருவிகள்",
+    "profile": "சுயவிவரம்",
+    "settings": "அமைப்புகள்",
+    "help": "உதவி",
+    "logout": "வெளியேறு"
+  },
+  "auth": {
+    "login": "உள்நுழை",
+    "register": "பதிவு செய்",
+    "email": "மின்னஞ்சல்",
+    "password": "கடவுச்சொல்",
+    "confirmPassword": "கடவுச்சொல் உறுதி",
+    "firstName": "முதல் பெயர்",
+    "lastName": "கடைசி பெயர்",
+    "forgotPassword": "கடவுச்சொல் மறந்துவிட்டதா?",
+    "rememberMe": "என்னை நினைவில் வைத்துக்கொள்",
+    "loginSuccess": "உள்நுழைவு வெற்றிகரமானது!",
+    "loginError": "உள்நுழைவு தோல்வியடைந்தது. உங்கள் விவரங்களைச் சரிபார்க்கவும்."
+  },
+  "dashboard": {
+    "welcome": "மீண்டும் வரவேற்கிறோம், {{name}}!",
+    "portfolioPerformance": "முதலீட்டு செயல்திறன்",
+    "learningProgress": "கற்றல் முன்னேற்றம்",
+    "recentActivity": "சமீபத்திய செயல்பாடு"
+  },
+  "trading": {
+    "buy": "வாங்கு",
+    "sell": "விற்கு",
+    "symbol": "குறியீடு",
+    "quantity": "அளவு",
+    "price": "விலை",
+    "total": "மொத்தம்"
+  },
+  "courses": {
+    "allCourses": "அனைத்து பாடங்கள்",
+    "myCourses": "என் பாடங்கள்",
+    "enroll": "சேரு",
+    "continue": "தொடர்",
+    "startCourse": "பாடத்தைத் தொடங்கு"
+  }
+}
