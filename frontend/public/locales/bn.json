@@ -1,0 +1,72 @@
+{
+  "common": {
+    "loading": "লোড হচ্ছে...",
+    "error": "ত্রুটি ঘটেছে",
+    "success": "সাফল্য",
+    "warning": "সতর্কতা",
+    "info": "তথ্য",
+    "save": "সংরক্ষণ করুন",
+    "cancel": "বাতিল করুন",
+    "delete": "মুছে ফেলুন",
+    "edit": "সম্পাদনা করুন",
+    "view": "দেখুন",
+    "search": "খুঁজুন",
+    "filter": "ছাঁকুন",
+    "sort": "সাজান",
+    "next": "পরবর্তী",
+    "previous": "পূর্ববর্তী",
+    "submit": "জমা দিন",
+    "reset": "রিসেট করুন",
+    "confirm": "নিশ্চিত করুন",
+    "close": "বন্ধ করুন"
+  },
+  "navigation": {
+    "home": "হোম",
+    "dashboard": "ড্যাশবোর্ড",
+    "courses": "কোর্স",
+    "trading": "লেনদেন",
+    "portfolio": "পোর্টফোলিও",
+    "analytics": "বিশ্লেষণ",
+    "community": "সম্প্রদায়",
+    "news": "সংবাদ",
+    "tools": "সরঞ্জাম",
+    "profile": "প্রোফাইল",
+    "settings": "সেটিংস",
+    "help": "সাহায্য",
+    "logout": "লগআউট"
+  },
+  "auth": {
+    "login": "লগইন",
+    "register": "নিবন্ধন",
+    "email": "ইমেইল",
+    "password": "পাসওয়ার্ড",
+    "confirmPassword": "পাসওয়ার্ড নিশ্চিত করুন",
+    "firstName": "প্রথম নাম",
+    "lastName": "শেষ নাম",
+    "forgotPassword": "পাসওয়ার্ড ভুলে গেছেন?",
+    "rememberMe": "আমাকে মনে রাখুন",
+    "loginSuccess": "লগইন সফল!",
+    "loginError": "লগইন ব্যর্থ। আপনার তথ্য পরীক্ষা করুন।"
+  },
+  "dashboard": {
+    "welcome": "আবার স্বাগতম, {{name}}!",
+    "portfolioPerformance": "পোর্টফোলিও পারফরমেন্স",
+    "learningProgress": "শেখার অগ্রগতি",
+    "recentActivity": "সাম্প্রতিক কার্যকলাপ"
+  },
+  "trading": {
+    "buy": "কিনুন",
+    "sell": "বিক্রি করুন",
+    "symbol": "চিহ্ন",
+    "quantity": "পরিমাণ",
+    "price": "মূল্য",
+    "total": "মোট"
+  },
+  "courses": {
+    "allCourses": "সব কোর্স",
+    "myCourses": "আমার কোর্স",
+    "enroll": "ভর্তি হন",
+    "continue": "চালিয়ে যান",
+    "startCourse": "কোর্স শুরু করুন"
+  }
+}
